@@ -11,8 +11,8 @@ class Game{
     this.WIDTH = WIDTH;
     this.board = [];
     this.currPlayer = 1;
-    this.makeBoard();
-    this.makeHtmlBoard();
+    document.getElementById("start").addEventListener("click", () => 
+    {this.makeBoard(); this.makeHtmlBoard()})
   }
 
   makeBoard() {
@@ -27,7 +27,7 @@ class Game{
     // make column tops (clickable area for adding a piece to that column)
     const top = document.createElement('tr');
     top.setAttribute('id', 'column-top');
-    top.addEventListener('click', this.handleClick);
+    top.addEventListener('click', this.handleClick.bind(this));
   
     for (let x = 0; x < this.WIDTH; x++) {
       const headCell = document.createElement('td');
@@ -49,7 +49,6 @@ class Game{
   
       board.append(row);
     }
-    this.board = board;
   }
 
   findSpotForCol(x) {
@@ -64,7 +63,7 @@ class Game{
   placeInTable(y, x) {
     const piece = document.createElement('div');
     piece.classList.add('piece');
-    piece.classList.add(`p${currPlayer}`);
+    piece.classList.add(`p${this.currPlayer}`);
     piece.style.top = -50 * (y + 2);
   
     const spot = document.getElementById(`${y}-${x}`);
@@ -78,21 +77,20 @@ class Game{
   handleClick(evt) { //do we need this?
     // get x from ID of clicked cell
     const x = +evt.target.id;
-  
     // get next spot in column (if none, ignore click)
-    // console.log(typeof this.findSpotForCol(x));
-    const y = Game.findSpotForCol(x);
+    // console.log(typeof this.findSpotForCol(x));    
+    const y = this.findSpotForCol(x);
     if (y === null) {
       return;
     }
   
     // place piece in board and add to HTML table
-    this.board[y][x] = currPlayer;
+    this.board[y][x] = this.currPlayer;
     this.placeInTable(y, x);
     
     // check for win
     if (this.checkForWin()) {
-      return this.endGame(`Player ${currPlayer} won!`);
+      return this.endGame(`Player ${this.currPlayer} won!`);
     }
     
     // check for tie

@@ -5,14 +5,26 @@
  * board fills (tie)
  */
 
+class Player{
+  constructor(color){
+    this.color = color;
+  }
+}
+
 class Game{
   constructor(HEIGHT = 6, WIDTH = 7){
     this.HEIGHT = HEIGHT;
     this.WIDTH = WIDTH;
     this.board = [];
-    this.currPlayer = 1;
-    document.getElementById("start").addEventListener("click", () => 
-    {this.makeBoard(); this.makeHtmlBoard()})
+    this.currPlayer = {turn: 1};
+    document.getElementById("start").addEventListener("click", () => {
+      const board = document.getElementById('board');
+      board.innerHTML = null;
+      this.makeBoard(); 
+      this.makeHtmlBoard();
+      this.player1 = new Player(document.getElementById("p1").value);
+      this.player2 = new Player(document.getElementById("p2").value);
+    })
   }
 
   makeBoard() {
@@ -63,8 +75,13 @@ class Game{
   placeInTable(y, x) {
     const piece = document.createElement('div');
     piece.classList.add('piece');
-    piece.classList.add(`p${this.currPlayer}`);
+    piece.classList.add(`p${this.currPlayer.turn}`);
     piece.style.top = -50 * (y + 2);
+    let cPlayer = `player${this.currPlayer.turn}`;
+    piece.style.backgroundColor = this[cPlayer].color;
+
+    //document.querySelector(".p1").style.backgroundColor = this.player1.color;
+    //piece.p2.style.backgroundColor = this.player2.color;
   
     const spot = document.getElementById(`${y}-${x}`);
     spot.append(piece);
@@ -72,6 +89,12 @@ class Game{
 
   endGame(msg) {
     alert(msg);
+    this.freezeGame();
+  }
+
+  freezeGame() {
+    let top = document.getElementById("column-top");
+    top.remove(); 
   }
   
   handleClick(evt) { //do we need this?
@@ -85,12 +108,12 @@ class Game{
     }
   
     // place piece in board and add to HTML table
-    this.board[y][x] = this.currPlayer;
+    this.board[y][x] = this.currPlayer.turn;
     this.placeInTable(y, x);
     
     // check for win
     if (this.checkForWin()) {
-      return this.endGame(`Player ${this.currPlayer} won!`);
+      return this.endGame(`Player ${this[`player${this.currPlayer.turn}`].color} won!`);
     }
     
     // check for tie
@@ -99,7 +122,7 @@ class Game{
     }
       
     // switch players
-    this.currPlayer = this.currPlayer === 1 ? 2 : 1;
+    this.currPlayer.turn = this.currPlayer.turn === 1 ? 2 : 1;
   }
 
   checkForWin() {
@@ -131,7 +154,7 @@ class Game{
         y < this.HEIGHT &&
         x >= 0 &&
         x < this.WIDTH &&
-        this.board[y][x] === this.currPlayer
+        this.board[y][x] === this.currPlayer.turn
     );
   }
 }
